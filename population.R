@@ -48,3 +48,27 @@ tm_ws <- tm_shape(r_b) +
 
 tmap_animation(tm_ws, filename = paste0("europe.gif"), width =2000, height = 2000, dpi = 200, delay = 40)
 
+r2000 <-  crop(raster(pop_dat[1]),euro_domain)
+r2024 <-  crop(raster(pop_dat[25]),euro_domain)
+
+r_diff <- r2024-r2000
+
+# create scale
+pop_bks_pos <- c(2,8,40, 100,500, 2000, 8000, 30000)
+pop_bks <- c(rev(0-pop_bks_pos), 0, pop_bks_pos)
+#pop_bks <- c(0, 200, 800, 2000, 50000, 100000)
+
+## define palette for population density
+pop_pal <- cols4all::c4a("gmt.no_green", n = 17)
+
+## create plot using tmap
+tm_diff <- tm_shape(r_diff) +
+  tm_raster(col.scale = tm_scale_intervals(values = pop_pal, breaks = pop_bks), col.legend = tm_legend(title = "\u0394persons per km\u00B2"))+
+  tm_legend(position = c(0.85,0.988), frame = FALSE)+
+  tm_layout(bg.color = "lightskyblue1", frame = FALSE,title.position = c(0,0.98),panel.show = FALSE)+
+  tm_title(text = "\u03942000-2024", size = 2)+
+  tm_credits("Source: Landscan Global, Oak Ridge National Laboratory. https://doi.org/10.48690/1532445")
+
+tm_diff
+
+tmap_save(tm_diff, "europe_diff.png", width =2000, height = 2000, dpi = 200)
